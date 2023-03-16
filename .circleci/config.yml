@@ -26,18 +26,18 @@ commands:
 
 jobs:
 
-  # create-instances:
-  #   docker:
-  #     - image: amazon/aws-cli 
-  #   steps:
-  #     - checkout 
-  #     - run:
-  #         name: Create the instances  
-  #         command: |
-  #            aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
+  create-instances:
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - checkout 
+      - run:
+          name: Create the instances  
+          command: |
+             aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
       
-  #     - destroy-bucket
-  #     - destroy-enviroment
+      - destroy-bucket
+      - destroy-enviroment
 
   create-bucket:
     docker:
@@ -99,7 +99,7 @@ jobs:
       - run:
           name: Configure server and install dependencies 
           command: |
-            ansible-playbook -i ~/inventory.txt  ~/configure-server.yml
+            ansible-playbook -i /root/project/inventory.txt  /root/project/configure-server.yml
       
       # - run: 
       #     name: ensure that nginx is runnign successsfully with its default web-page.
@@ -255,12 +255,12 @@ jobs:
 workflows:
   default:
     jobs:
-      #- create-instances
+      - create-instances
       - create-bucket
       - store-app:
           requires: [create-bucket]
-      - confiugre-instaces
-          #requires: [create-instances]
+      - confiugre-instaces:
+          requires: [create-instances]
       - fetch-app: 
           requires: [store-app]
       - build-app:
