@@ -174,6 +174,10 @@ jobs:
       CI: false 
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints: 
+            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
+            
       
       - restore_cache:
           keys: 
@@ -208,6 +212,22 @@ jobs:
             cd ~/react/app
             npm run build
             ls -la 
+
+      - restore_cache:
+          keys: 
+            - inv
+
+
+
+      - run: cat ~/inventory.txt
+      - run: pwd
+      - run: ls -la 
+            
+      - run:
+          name: Configure server and install dependencies 
+          command: |
+            ansible-playbook -i ~/inventory.txt  ~~/configure-nginx.yml
+
       
       - save_cache:
           key: build-dir
@@ -221,7 +241,7 @@ jobs:
 
   configure-nginx:
     docker:
-      - image: python:3.9-alpine3.16  #has no SSH 
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
@@ -234,7 +254,7 @@ jobs:
           command: |
             apk add --no-cache tar gzip
             pip install ansible awscli
-            apk add openssh-client
+            
       
       - restore_cache:
           keys: 
@@ -244,7 +264,7 @@ jobs:
       - run: ls -la
 
 
-      - run: sudo find / | grep "build "
+      
       
             
       - restore_cache:
