@@ -29,6 +29,8 @@ jobs:
   create-instances:
     docker:
       - image: amazon/aws-cli 
+    environment:
+      CI: false 
     steps:
       - checkout 
       - run: echo ${CI}
