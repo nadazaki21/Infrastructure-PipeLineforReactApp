@@ -94,10 +94,10 @@ jobs:
 
       - run: cat ~/inventory.txt
 
-      
+      - run: ls -la ~
             
       - run:
-          name: Configure server and install the node_exporter for Prometheus
+          name: Configure server and install dependencies 
           command: |
             ansible-playbook -i ~/inventory.txt  ~/configure-server.yml
       
