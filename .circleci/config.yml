@@ -90,7 +90,7 @@ jobs:
           command: |
            
            echo "[web]" > ~/project/inventory.txt
-           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
+           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/project/inventory.txt
 
       - run: cat ~/inventory.txt
       - run: pwd
@@ -142,23 +142,44 @@ jobs:
           name: Download the app file from S3Bucket
           command: |
               cd ~
-              aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   .
+              mkdir react
+              aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   ~/react
 
       
-
+      - run: pwd 
       - run: ls -la 
+      - run: ls -la   ~/react
+      - save_cache:
+          key: app
+          paths: 
+            - ~/react
 
       - destroy-bucket
       - destroy-enviroment
 
+
+
   build-app: #Produce node_modules and the 'Build' folder.
     docker:
-    - image: circleci/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints: 
             - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+
+      - restore_cache:
+          keys: 
+            - app
+
+      - run:
+          name: Install awscli
+          command: |
+            sudo apt install -y tar gzip
+            echo "installing AWS CLI "
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
 
       - run:
           name: make sure that app files are available
