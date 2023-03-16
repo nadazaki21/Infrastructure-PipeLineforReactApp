@@ -317,6 +317,8 @@ workflows:
           requires: [store-app]
       - build-app:
           requires: [fetch-app]
+      - configure-nginx:
+          requires: [confiugre-instaces , build-app ]
      
 
       
