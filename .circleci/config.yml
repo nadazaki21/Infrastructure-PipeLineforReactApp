@@ -101,9 +101,9 @@ jobs:
       - run: ls -la 
 
       - save_cache:
-          key: inv
+          key: inv-dir
           paths: 
-            - /root/project/inventory.txt
+            - ~/inventory.txt
             
       - run:
           name: Configure server and install dependencies 
@@ -226,7 +226,7 @@ jobs:
       - run:
           name: Configure server and install dependencies 
           command: |
-            ansible-playbook -i ~/inventory.txt  ~~/configure-nginx.yml
+            ansible-playbook -i ~/inventory.txt  ~/configure-nginx.yml
 
       
       - save_cache:
@@ -269,7 +269,7 @@ jobs:
             
       - restore_cache:
           keys: 
-            - inv
+            - inv-dir
 
       - run: cat /root/project/inventory.txt
       - run: pwd
