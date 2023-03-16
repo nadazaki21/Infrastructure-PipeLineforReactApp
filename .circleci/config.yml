@@ -89,10 +89,10 @@ jobs:
           name: Add hosting Instace ip to ansible inventory
           command: |
            
-           echo "[web]" > ~/project/inventory.txt
-           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/project/inventory.txt
+           echo "[web]" > /root/project/inventory.txt
+           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> /root/project/inventory.txt
 
-      - run: cat ~/project/inventory.txt
+      - run: cat /root/project/inventory.txt
       - run: pwd
       - run: ls -la 
             
@@ -184,19 +184,19 @@ jobs:
       - run:
           name: make sure that app files are available
           command: |
-              ls -la ~
+              ls -la ~/react
       
       - run: 
           name: Produce node_modules folder
           command: |
-            cd ~ 
+            cd ~/react 
             npm install 
             ls -la 
 
       - run: 
           name: Produce build folder
           command: |
-            cd ~ 
+            cd ~/react
             npm run build
             ls -la 
 
