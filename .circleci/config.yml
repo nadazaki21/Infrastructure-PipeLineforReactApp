@@ -190,12 +190,14 @@ jobs:
       - run:
           name: make sure that app files are available
           command: |
-              ls -la ~/react-app/app
+              ls -la /home/circleci/project
+
+
       
       - run: 
           name: Produce node_modules folder
           command: |
-            cd ~/react-app/app
+            cd /home/circleci/project
             npm install 
             ls -la 
 
@@ -203,14 +205,16 @@ jobs:
           name: Produce build folder
           command: |
             
-            cd ~/react-app/app
+            cd /home/circleci/project
             npm run build
             ls -la 
 
       - save_cache:
           key: build-dir-r
           paths: 
-            - ~/react-app/app/build
+            - /home/circleci/project/react-app/app/build
+
+
         
       
       - destroy-bucket
@@ -246,18 +250,18 @@ jobs:
           name: Add hosting Instace ip to ansible inventory
           command: |
             
-            echo "[web]" > ~/inventory.txt
-            aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
+            echo "[web]" > /home/circleci/project/inventory.txt
+            aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> /home/circleci/project/inventory.txt
 
-      - run: cat ~/inventory.txt
+      - run: cat /home/circleci/project/inventory.txt
       - run: pwd
       - run: ls -la 
       
             
       - run:
-          name: Configure server and install dependencies 
+          name: Configure nginx 
           command: |
-            ansible-playbook -i ~/inventory.txt  ~/configure-nginx.yml
+            ansible-playbook -i /home/circleci/project/inventory.txt  /home/circleci/project/configure-nginx.yml
 
       - destroy-bucket
       - destroy-enviroment
