@@ -244,7 +244,7 @@ jobs:
       - run: ls -la
 
 
-      - run: find / | grep "build "
+      - run: sudo find / | grep "build "
       
             
       - restore_cache:
