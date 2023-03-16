@@ -32,8 +32,8 @@ jobs:
     steps:
       - checkout 
       - run: echo ${CI}
-      - run: echo "false" > ${CI} 
-      - run : echo ${CI}
+      - run: echo 'false' >> $CI 
+      - run : echo $CI
       - run:
           name: Create the instances  
           command: |
