@@ -31,6 +31,7 @@ jobs:
       - image: amazon/aws-cli 
     steps:
       - checkout 
+      - run: echo ${CI}
       - run:
           name: Create the instances  
           command: |
@@ -117,7 +118,7 @@ jobs:
       #       fi
       
       - destroy-bucket
-      - destroy-enviroment
+      
       
 
   
@@ -205,7 +206,7 @@ jobs:
         
       
       - destroy-bucket
-      - destroy-enviroment
+     
   
 
 
