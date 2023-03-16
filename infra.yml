@@ -27,16 +27,7 @@ Parameters:
       Description: AZ subnet 2
       Type: String
 
-    ID:
-
-      Description: Unique Identifier
-      Type: String
-      Default: "1"
-
-
-
-
-
+  
 
 Resources:
 
@@ -87,12 +78,16 @@ Resources:
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties: 
-      Tags: 
-        - Key: Name
-          Value: "Pulic Route Table"
       VpcId: !Ref MainVPC  # The route table cannot use the Internet Gateway until it has successfully attached to the VPC.
 
-  
+  PublicInternetOutboundRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway #If you create a route that references an Internet Gateway in the same template where you create the Internet Gateway, you must declare a dependency on the Internet Gateway attachment.
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGW
+        
 
   AssociatePUBLIC1toRT:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -100,7 +95,7 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
   
-  AssociatePUBLI2CtoRT:
+  AssociatePUBLIC2toRT:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties: 
       RouteTableId: !Ref PublicRouteTable
@@ -108,15 +103,7 @@ Resources:
 
   
   
-  PublicInternetOutboundRoute:
-    Type: AWS::EC2::Route
-    DependsOn: AttachInternetGateway #If you create a route that references an Internet Gateway in the same template where you create the Internet Gateway, you must declare a dependency on the Internet Gateway attachment.
-    Properties:
-      RouteTableId:
-        Ref: PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId:
-        Ref: InternetGW
+  
 
   
   InstanceProfile:
@@ -159,6 +146,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # you can limit shh connection to your own public ip only 
     
 
   TargetGroup:  

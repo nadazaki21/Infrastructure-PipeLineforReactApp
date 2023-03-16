@@ -3,7 +3,6 @@ Description:
 
 Parameters:
 
-
   WorkflowID:
       Description: An environment name that will be prefixed to resource names
       Type: String
@@ -12,16 +11,15 @@ Parameters:
 Resources:
 
   EC21:
-      Type: AWS::EC2::Instance
-      Properties:
-        InstanceType: t3.micro
-        ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
-        SecurityGroupIds:  
-          - Fn::ImportValue: InstanceSecurityGroup 
-        IamInstanceProfile:  !ImportValue EC2Profile 
-        SubnetId: !ImportValue "Public-Subnet1" 
-        KeyName: nada
-        Tags: 
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
+      SecurityGroupIds:  
+        - Fn::ImportValue: InstanceSecurityGroup 
+      SubnetId: !ImportValue "Public-Subnet1" 
+      KeyName:  "nada"
+      Tags: 
         - Key: Name
           Value: !Sub "ec2-${WorkflowID}"
 
@@ -29,13 +27,12 @@ Resources:
   EC22:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t3.micro
+      InstanceType: t2.micro
       ImageId: ami-0557a15b87f6559cf   #Ubuntu22 
       SecurityGroupIds:  
         - Fn::ImportValue: InstanceSecurityGroup 
-      IamInstanceProfile:  !ImportValue EC2Profile  
       SubnetId:  !ImportValue "Public-Subnet2"
-      KeyName: nada
+      KeyName: "nada"
       Tags: 
         - Key: Name
           Value: !Sub "ec2-${WorkflowID}"
