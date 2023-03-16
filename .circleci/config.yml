@@ -231,10 +231,18 @@ jobs:
             apk add --no-cache tar gzip
             pip install ansible awscli
             apk add openssh-client
-            
+      
       - restore_cache:
           keys: 
             - app
+
+      - run: ls -la
+      - run: ls -la /root/project/app
+
+            
+      - restore_cache:
+          keys: 
+            - inv
 
       - run: cat /root/project/inventory.txt
       - run: pwd
