@@ -99,6 +99,11 @@ jobs:
       - run: cat /root/project/inventory.txt
       - run: pwd
       - run: ls -la 
+
+      - save_cache:
+          key: inv
+          paths: 
+            - /root/project/inventory.txt
             
       - run:
           name: Configure server and install dependencies 
@@ -131,9 +136,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: 
-            - "	1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
+      
       - run:
           name: Install awscli
           command: |
@@ -171,10 +174,7 @@ jobs:
       CI: false 
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: 
-            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
-
+      
       - restore_cache:
           keys: 
             - app
@@ -215,15 +215,41 @@ jobs:
       - destroy-enviroment
   
 
+  configure-nginx:
+    docker:
+      - image: python:3.9-alpine3.16  #has no SSH 
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: 
+            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
+            
 
-  # #run-app: "npm build " " npm run start " # it runs when ngginx starts 
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache tar gzip
+            pip install ansible awscli
+            apk add openssh-client
+            
+      - restore_cache:
+          keys: 
+            - app
 
-  # #make-website-available:
+      - run: cat /root/project/inventory.txt
+      - run: pwd
+      - run: ls -la 
+            
+      - run:
+          name: Configure server and install dependencies 
+          command: |
+            ansible-playbook -i /root/project/inventory.txt  /root/project/configure-nginx.yml
 
-  # confiugre-nginx:
   
-   
-  # #restart-ngnix:
+
+  
+  
+
   
   # run-pm2:
   
