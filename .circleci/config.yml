@@ -32,7 +32,7 @@ jobs:
     steps:
       - checkout 
       - run: echo ${CI}
-      - run: ${CI} = false
+      - run: echo "false" > ${CI} 
       - run : echo ${CI}
       - run:
           name: Create the instances  
