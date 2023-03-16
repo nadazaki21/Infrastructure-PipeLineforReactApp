@@ -253,10 +253,6 @@ jobs:
           command: |
             ansible-playbook -i /root/project/inventory.txt  /root/project/configure-nginx.yml
 
-  
-
-  
-  
 
   
   # run-pm2:
