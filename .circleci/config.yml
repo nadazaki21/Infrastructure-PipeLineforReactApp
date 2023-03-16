@@ -210,9 +210,9 @@ jobs:
             ls -la 
       
       - save_cache:
-          key: build
+          key: build-dir
           paths: 
-            - ~/react/app
+            - ~/react/app/build
         
       
       - destroy-bucket
@@ -238,18 +238,14 @@ jobs:
       
       - restore_cache:
           keys: 
-            - build
+            - build-dir
       
       - run: pwd 
       - run: ls -la
 
 
-      - run: ls -la ~/build
+      - run: find / | grep "build "
       
-      - run: pwd 
-      - run: ls -la
-      
-
             
       - restore_cache:
           keys: 
@@ -263,6 +259,9 @@ jobs:
           name: Configure server and install dependencies 
           command: |
             ansible-playbook -i /root/project/inventory.txt  /root/project/configure-nginx.yml
+
+      - destroy-bucket
+      - destroy-enviroment
 
 
   
