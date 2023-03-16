@@ -33,8 +33,6 @@ jobs:
       CI: false 
     steps:
       - checkout 
-      - run: echo ${CI}
-      - run: echo 'false' >> $CI 
       - run : echo $CI
       - run:
           name: Create the instances  
@@ -122,6 +120,7 @@ jobs:
       #       fi
       
       - destroy-bucket
+      - destroy-enviroment
       
       
 
@@ -168,6 +167,8 @@ jobs:
   build-app: #Produce node_modules and the 'Build' folder.
     docker:
       - image: circleci/node:13.8.0
+    environment:
+      CI: false 
     steps:
       - checkout
       - add_ssh_keys:
@@ -177,7 +178,7 @@ jobs:
       - restore_cache:
           keys: 
             - app
-      - run: ${CI} = false
+
       - run : echo ${CI}
       - run:
           name: Install awscli
@@ -203,7 +204,7 @@ jobs:
       - run: 
           name: Produce build folder
           command: |
-            ${CI} = false 
+            
             cd ~/react/app
             npm run build
             ls -la 
@@ -211,7 +212,7 @@ jobs:
         
       
       - destroy-bucket
-     
+      - destroy-enviroment
   
 
 
