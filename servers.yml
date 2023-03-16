@@ -23,6 +23,17 @@ Resources:
         - Key: Name
           Value: !Sub "ec2-${WorkflowID}"
 
+  # EC21:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: t2.micro
+  #     ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
+  #     SecurityGroupIds:  
+  #       - Ref:  InstanceSecurityGroup
+  #     SubnetId: !Ref PublicSubnet1 
+  #     KeyName:  "nada"
+  
+
 
   EC22:
     Type: AWS::EC2::Instance
@@ -36,7 +47,7 @@ Resources:
       Tags: 
         - Key: Name
           Value: !Sub "ec2-${WorkflowID}"
-
   
 
+ 
        

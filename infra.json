@@ -9,7 +9,7 @@
 
     {
         "ParameterKey": "PubSubnetCIDR1",
-        "ParameterValue": "10.0.3.0/24"
+        "ParameterValue": "10.0.6.0/24"
     },
 
     {

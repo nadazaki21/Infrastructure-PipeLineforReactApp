@@ -1,0 +1,95 @@
+Description: 
+  InfraStructure for hosting the web application 
+
+
+
+Resources:
+
+  MainVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: "Main VPC"
+        
+
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.6.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref MainVPC  
+      Tags: 
+        - Key: Name
+          Value:  Public Subnet1
+
+  
+
+  InternetGW:
+    Type: AWS::EC2::InternetGateway
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MainVPC
+      InternetGatewayId: !Ref InternetGW  
+
+      
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref MainVPC  # The route table cannot use the Internet Gateway until it has successfully attached to the VPC.
+
+  PublicInternetOutboundRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway #If you create a route that references an Internet Gateway in the same template where you create the Internet Gateway, you must declare a dependency on the Internet Gateway attachment.
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGW
+        
+
+  AssociatePUBLIC1toRT:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+  
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allowing web requests and ssh connection with my public ip 
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # you can limit shh connection to your own public ip only 
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0    
+
+  EC21:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
+      SecurityGroupIds:  
+        - Ref:  InstanceSecurityGroup
+      SubnetId: !Ref PublicSubnet1 
+      KeyName:  "nada"
+     
+  
