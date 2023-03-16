@@ -76,7 +76,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: 
-            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
             
 
       - run:
@@ -129,7 +129,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: 
-            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+            - "	1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
       - run:
           name: Install awscli
           command: |
@@ -167,7 +167,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: 
-            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
 
       - restore_cache:
           keys: 
@@ -197,6 +197,7 @@ jobs:
       - run: 
           name: Produce build folder
           command: |
+            ${CI} = false 
             cd ~/react/app
             npm run build
             ls -la 
