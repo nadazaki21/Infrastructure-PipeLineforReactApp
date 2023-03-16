@@ -32,6 +32,8 @@ jobs:
     steps:
       - checkout 
       - run: echo ${CI}
+      - run: ${CI} = false
+      - run : echo ${CI}
       - run:
           name: Create the instances  
           command: |
@@ -173,7 +175,8 @@ jobs:
       - restore_cache:
           keys: 
             - app
-
+      - run: ${CI} = false
+      - run : echo ${CI}
       - run:
           name: Install awscli
           command: |

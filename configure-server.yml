@@ -14,9 +14,9 @@
 
   pre_tasks:
 
-    - name: "wait 120 seconds for target connection to become reachable/usable."
+    - name: "wait 150 seconds for target connection to become reachable/usable."
       pause:
-        seconds: 120     # 120 seconds is enough
+        seconds: 150     # 120 seconds is enough
 
 
     - name: Install Python
