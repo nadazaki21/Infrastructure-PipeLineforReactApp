@@ -10,6 +10,7 @@ commands:
           command: |
             
             aws cloudformation delete-stack --stack-name servers-${CIRCLE_WORKFLOW_ID:0:5}
+            aws cloudformation delete-stack --stack-name "s3bucket-${CIRCLE_WORKFLOW_ID:0:5}"
             
   
   destroy-bucket:
@@ -89,7 +90,7 @@ jobs:
           command: |
            
            echo "[web]" > ~/project/inventory.txt
-           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values="ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
+           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
 
       - run: cat ~/inventory.txt
 
@@ -113,9 +114,10 @@ jobs:
             else
               exit 1
             fi
-
-      - destroy-enviroment
+      
       - destroy-bucket
+      - destroy-enviroment
+      
 
   
 
