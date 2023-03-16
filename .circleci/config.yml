@@ -208,7 +208,11 @@ jobs:
             cd ~/react/app
             npm run build
             ls -la 
-
+      
+      - save_cache:
+          key: build
+          paths: 
+            - ~/react/app
         
       
       - destroy-bucket
@@ -234,10 +238,17 @@ jobs:
       
       - restore_cache:
           keys: 
-            - app
-
+            - build
+      
+      - run: pwd 
       - run: ls -la
-      - run: ls -la /root/project/app
+
+
+      - run: ls -la ~/build
+      
+      - run: pwd 
+      - run: ls -la
+      
 
             
       - restore_cache:
