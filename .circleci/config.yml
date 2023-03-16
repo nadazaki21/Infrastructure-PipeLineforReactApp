@@ -42,33 +42,33 @@ jobs:
       - destroy-bucket
       - destroy-enviroment
 
-  create-bucket:
-    docker:
-      - image: amazon/aws-cli 
-    steps:
-      - checkout 
-      - run:
-          name: Create  S3 Bucket 
-          command: |
-            aws cloudformation deploy --template-file s3bucket.yml   --stack-name "s3bucket-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"   --tags project=udapeople 
-            #A stack to be able to apply all of the s3bucket confuguartins that are in s3bucket.yml file, I would have used the cli ttool to craete the buckeyt but it will not take configurations 
+  # create-bucket:
+  #   docker:
+  #     - image: amazon/aws-cli 
+  #   steps:
+  #     - checkout 
+  #     - run:
+  #         name: Create  S3 Bucket 
+  #         command: |
+  #           aws cloudformation deploy --template-file s3bucket.yml   --stack-name "s3bucket-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"   --tags project=udapeople 
+  #           #A stack to be able to apply all of the s3bucket confuguartins that are in s3bucket.yml file, I would have used the cli ttool to craete the buckeyt but it will not take configurations 
       
-      - destroy-bucket
-      - destroy-enviroment
+  #     - destroy-bucket
+  #     - destroy-enviroment
 
 
-  store-app: #In S3 Bucket 
-    docker:
-      - image: amazon/aws-cli 
-    steps:
-      - checkout 
-      - run:
-          name: put app files in the bucket 
-          command: |
-              aws s3 sync react-app s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}
+  # store-app: #In S3 Bucket 
+  #   docker:
+  #     - image: amazon/aws-cli 
+  #   steps:
+  #     - checkout 
+  #     - run:
+  #         name: put app files in the bucket 
+  #         command: |
+  #             aws s3 sync react-app s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}
       
-      - destroy-bucket
-      - destroy-enviroment
+  #     - destroy-bucket
+  #     - destroy-enviroment
  
 
 
@@ -124,46 +124,46 @@ jobs:
       #         exit 1
       #       fi
       
-      - destroy-bucket
-      - destroy-enviroment
+      # - destroy-bucket
+      # - destroy-enviroment
       
       
 
   
 
-  fetch-app: #from S3 bucket
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
+  # fetch-app: #from S3 bucket
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
       
-      - run:
-          name: Install awscli
-          command: |
-            sudo apt install -y tar gzip
-            echo "installing AWS CLI "
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+  #     - run:
+  #         name: Install awscli
+  #         command: |
+  #           sudo apt install -y tar gzip
+  #           echo "installing AWS CLI "
+  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  #           unzip awscliv2.zip
+  #           sudo ./aws/install
 
-      - run:
-          name: Download the app file from S3Bucket
-          command: |
-              cd ~
-              mkdir react
-              aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   ~/react
+  #     - run:
+  #         name: Download the app file from S3Bucket
+  #         command: |
+  #             cd ~
+  #             mkdir react
+  #             aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   ~/react
 
       
-      - run: pwd 
-      - run: ls -la 
-      - run: ls -la   ~/react
-      - save_cache:
-          key: app
-          paths: 
-            - ~/react
+  #     - run: pwd 
+  #     - run: ls -la 
+  #     - run: ls -la   ~/react
+  #     - save_cache:
+  #         key: app
+  #         paths: 
+  #           - ~/react
 
-      - destroy-bucket
-      - destroy-enviroment
+  #     - destroy-bucket
+  #     - destroy-enviroment
 
 
 
@@ -197,7 +197,7 @@ jobs:
       - run: 
           name: Produce node_modules folder
           command: |
-            cd /home/circleci/project
+            cd /home/circleci/project/react-app/app
             npm install 
             ls -la 
 
@@ -205,7 +205,7 @@ jobs:
           name: Produce build folder
           command: |
             
-            cd /home/circleci/project
+            cd /home/circleci/project/react-app/app
             npm run build
             ls -la 
 
@@ -325,15 +325,15 @@ workflows:
   default:
     jobs:
       - create-instances
-      - create-bucket
-      - store-app:
-          requires: [create-bucket]
+      #- create-bucket
+      #- store-app:
+          #requires: [create-bucket]
       - confiugre-instaces:
           requires: [create-instances]
-      - fetch-app: 
-          requires: [store-app]
-      - build-app:
-          requires: [fetch-app]
+      #- fetch-app: 
+          #requires: [store-app]
+      - build-app
+          #requires: [fetch-app]
       - configure-nginx:
           requires: [confiugre-instaces , build-app ]
      
