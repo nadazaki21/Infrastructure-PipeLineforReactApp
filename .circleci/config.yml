@@ -25,17 +25,18 @@ commands:
 
 jobs:
 
-  create-instances:
-    docker:
-      - image: amazon/aws-cli 
-    steps:
-      - checkout 
-      - run:
-          name: Create the instances  
-          command: |
-             aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
+  # create-instances:
+  #   docker:
+  #     - image: amazon/aws-cli 
+  #   steps:
+  #     - checkout 
+  #     - run:
+  #         name: Create the instances  
+  #         command: |
+  #            aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
       
-      - destroy-enviroment
+  #     - destroy-bucket
+  #     - destroy-enviroment
 
   create-bucket:
     docker:
@@ -77,20 +78,22 @@ jobs:
             - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
 
       - run:
-          name: Add hosting Instace ip to ansible inventory
-          command: |
-           
-           echo "[web]" > ~/project/inv/inventory.txt
-           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ReactApp"    --output text >> ~/inventory.txt
-
-      - run: cat ~/inventory.txt
-
-      - run:
           name: Install dependencies
           command: |
             apk add --no-cache tar gzip
             pip install ansible awscli
             apk add openssh-client
+            
+      - run:
+          name: Add hosting Instace ip to ansible inventory
+          command: |
+           
+           echo "[web]" > ~/project/inventory.txt
+           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values="ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
+
+      - run: cat ~/inventory.txt
+
+      
             
       - run:
           name: Configure server and install the node_exporter for Prometheus
@@ -137,8 +140,11 @@ jobs:
           name: Download the app file from S3Bucket
           command: |
               cd ~
-              aws s3 cp s3://react-gp23--${CIRCLE_WORKFLOW_ID:0:5}
+              aws s3 sync  s3://react-gp23--${CIRCLE_WORKFLOW_ID:0:5}   .
+
       
+
+      - run: ls -la 
 
       - destroy-bucket
       - destroy-enviroment
@@ -170,27 +176,31 @@ jobs:
             cd ~ 
             npm run build
             ls -la 
+
+      
+
+      - run: ls -la 
+
+        
       
       - destroy-bucket
       - destroy-enviroment
   
 
 
-  #run-app: "npm build " " npm run start " # it runs when ngginx starts 
+  # #run-app: "npm build " " npm run start " # it runs when ngginx starts 
 
-  #make-website-available:
+  # #make-website-available:
 
-  confiugre-nginx:
+  # confiugre-nginx:
   
    
-  #restart-ngnix:
+  # #restart-ngnix:
   
-  run-pm2:
-
-
+  # run-pm2:
   
 
-  #smoke-test:
+  # #smoke-test:
 
   cleanup:
     docker:
@@ -239,34 +249,20 @@ jobs:
               fi
               
 
-              
-              
-    
-  # domain name 
-
 
 workflows:
   default:
     jobs:
+      #- create-instances
       - create-bucket
-     
-
-      # - confiugre-instaces:
-      #     requires: [deploy-infrastructure]
-      
       - store-app:
           requires: [create-bucket]
-      - deploy-infrastructure:
+      - confiugre-instaces:
+          #requires: [create-instances]
+      - fetch-app: 
           requires: [store-app]
-      - cleanup:
-          requires: [deploy-infrastructure]
-      # - fetch-app:
-      #     requires: [deploy-infrastructure , store-app ]
-      # - build-app:
-      #     requires: [fetch-app ]
-      
-
-
+      - build-app:
+          requires: [fetch-app]
      
 
       

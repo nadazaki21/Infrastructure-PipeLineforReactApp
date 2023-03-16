@@ -20,6 +20,7 @@ Resources:
           - Fn::ImportValue: InstanceSecurityGroup 
         IamInstanceProfile:  !ImportValue EC2Profile 
         SubnetId: !ImportValue "Public-Subnet1" 
+        KeyName: nada
         Tags: 
         - Key: Name
           Value: "ec2-${WorkflowID}"
@@ -34,6 +35,7 @@ Resources:
         - Fn::ImportValue: InstanceSecurityGroup 
       IamInstanceProfile:  !ImportValue EC2Profile  
       SubnetId:  !ImportValue "Public-Subnet2"
+      KeyName: nada
       Tags: 
         - Key: Name
           Value: "ec2-${WorkflowID}"

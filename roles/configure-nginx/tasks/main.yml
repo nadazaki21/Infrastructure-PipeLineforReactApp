@@ -14,11 +14,9 @@
     
 - name: copy the nginx config file 
   copy:
-    src: ~/default
+    src: ~/roles/configure-nginx/files/default
     dest: /etc/nginx/sites-available/default
   become: yes
-
-
 
 - name: restart nginx
   service:
