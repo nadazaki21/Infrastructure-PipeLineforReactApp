@@ -184,25 +184,21 @@ jobs:
       - run:
           name: make sure that app files are available
           command: |
-              ls -la ~/react
+              ls -la ~/react/app
       
       - run: 
           name: Produce node_modules folder
           command: |
-            cd ~/react 
+            cd ~/react/app
             npm install 
             ls -la 
 
       - run: 
           name: Produce build folder
           command: |
-            cd ~/react
+            cd ~/react/app
             npm run build
             ls -la 
-
-      
-
-      - run: ls -la 
 
         
       
