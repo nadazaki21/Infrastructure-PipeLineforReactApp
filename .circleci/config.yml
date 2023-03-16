@@ -174,15 +174,6 @@ jobs:
       CI: false 
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: 
-            - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
-            
-      
-      - restore_cache:
-          keys: 
-            - app
-
       - run : echo ${CI}
       - run:
           name: Install awscli
@@ -196,12 +187,12 @@ jobs:
       - run:
           name: make sure that app files are available
           command: |
-              ls -la ~/react/app
+              ls -la ~/react-app/app
       
       - run: 
           name: Produce node_modules folder
           command: |
-            cd ~/react/app
+            cd ~/react-app/app
             npm install 
             ls -la 
 
@@ -209,30 +200,14 @@ jobs:
           name: Produce build folder
           command: |
             
-            cd ~/react/app
+            cd ~/react-app/app
             npm run build
             ls -la 
 
-      - restore_cache:
-          keys: 
-            - inv-dir
-
-
-
-      - run: cat ~/inventory.txt
-      - run: pwd
-      - run: ls -la 
-            
-      - run:
-          name: Configure server and install dependencies 
-          command: |
-            ansible-playbook -i ~/inventory.txt  ~/configure-nginx.yml
-
-      
       - save_cache:
-          key: build-dir
+          key: build-dir-r
           paths: 
-            - ~/react/app/build
+            - ~/react-app/app/build
         
       
       - destroy-bucket
@@ -258,27 +233,28 @@ jobs:
       
       - restore_cache:
           keys: 
-            - build-dir
+            - build-dir-r
       
       - run: pwd 
       - run: ls -la
 
 
-      
-      
-            
-      - restore_cache:
-          keys: 
-            - inv-dir
+      - run:
+        name: Add hosting Instace ip to ansible inventory
+        command: |
+          
+          echo "[web]" > ~/inventory.txt
+          aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
 
-      - run: cat /root/project/inventory.txt
+      - run: cat ~/inventory.txt
       - run: pwd
       - run: ls -la 
+      
             
       - run:
           name: Configure server and install dependencies 
           command: |
-            ansible-playbook -i /root/project/inventory.txt  /root/project/configure-nginx.yml
+            ansible-playbook -i ~/inventory.txt  ~/configure-nginx.yml
 
       - destroy-bucket
       - destroy-enviroment
