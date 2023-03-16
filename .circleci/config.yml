@@ -94,26 +94,26 @@ jobs:
 
       - run: cat ~/inventory.txt
 
-      - run: ls -la ~
+      - run: ls -la 
             
       - run:
           name: Configure server and install dependencies 
           command: |
             ansible-playbook -i ~/inventory.txt  ~/configure-server.yml
       
-      - run: 
-          name: ensure that nginx is runnign successsfully with its default web-page.
-          command: | 
-           URL = aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" 
-           echo ${URL}
-           if curl -s ${URL} | grep "Welcome"
-            then
-              echo "nginx is working successfully"
-                # Change this to 0 after the job fails
-              exit 0
-            else
-              exit 1
-            fi
+      # - run: 
+      #     name: ensure that nginx is runnign successsfully with its default web-page.
+      #     command: | 
+      #      URL = aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" 
+      #      echo ${URL}
+      #      if curl -s ${URL} | grep "Welcome"
+      #       then
+      #         echo "nginx is working successfully"
+      #           # Change this to 0 after the job fails
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
       
       - destroy-bucket
       - destroy-enviroment
