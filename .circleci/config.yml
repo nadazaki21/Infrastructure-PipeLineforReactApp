@@ -93,7 +93,7 @@ jobs:
            aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}"    --output text >> ~/inventory.txt
 
       - run: cat ~/inventory.txt
-
+      - run: pwd
       - run: ls -la 
             
       - run:
