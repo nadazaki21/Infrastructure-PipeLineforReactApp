@@ -257,7 +257,7 @@ workflows:
       - create-bucket
       - store-app:
           requires: [create-bucket]
-      - confiugre-instaces:
+      - confiugre-instaces
           #requires: [create-instances]
       - fetch-app: 
           requires: [store-app]
