@@ -23,7 +23,7 @@ Resources:
         KeyName: nada
         Tags: 
         - Key: Name
-          Value: "ec2-${WorkflowID}"
+          Value: !Sub "ec2-${WorkflowID}"
 
 
   EC22:
@@ -38,7 +38,7 @@ Resources:
       KeyName: nada
       Tags: 
         - Key: Name
-          Value: "ec2-${WorkflowID}"
+          Value: !Sub "ec2-${WorkflowID}"
 
   
 
