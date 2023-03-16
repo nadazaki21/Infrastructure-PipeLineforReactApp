@@ -158,12 +158,12 @@ Resources:
 
 
   
-  InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties: 
-      InstanceProfileName: EC2Instance
-      Roles: 
-        - "react"  
+  # InstanceProfile:
+  #   Type: AWS::IAM::InstanceProfile
+  #   Properties: 
+  #     InstanceProfileName: EC2Instance
+  #     Roles: 
+  #       - "react"  
 
 
   InstanceSecurityGroup:
@@ -290,11 +290,11 @@ Outputs:
       Name:  "InstanceSecurityGroup"
 
   
-  EC2Profile:
-    Description: Instances security rules 
-    Value: !Ref  InstanceProfile
-    Export:
-      Name:  "EC2Profile"
+  # EC2Profile:
+  #   Description: Instances security rules 
+  #   Value: !Ref  InstanceProfile
+  #   Export:
+  #     Name:  "EC2Profile"
 
   
   LoadBalancerDNSName:
