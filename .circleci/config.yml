@@ -142,7 +142,7 @@ jobs:
           name: Download the app file from S3Bucket
           command: |
               cd ~
-              aws s3 sync  s3://react-gp23--${CIRCLE_WORKFLOW_ID:0:5}   .
+              aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   .
 
       
 
