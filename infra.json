@@ -1,0 +1,32 @@
+[
+
+
+    {
+        "ParameterKey": "VPCCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    }, 
+
+
+    {
+        "ParameterKey": "PubSubnetCIDR1",
+        "ParameterValue": "10.0.3.0/24"
+    },
+
+    {
+        "ParameterKey": "PubSubnetCIDR2",
+        "ParameterValue": "10.0.4.0/24"
+    },
+
+    
+    {
+        "ParameterKey": "AZ1",
+        "ParameterValue": "us-east-1b"
+    },
+
+    {
+        "ParameterKey": "AZ2",
+        "ParameterValue": "us-east-1a"
+    }
+    
+     
+]

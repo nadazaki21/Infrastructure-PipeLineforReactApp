@@ -1,0 +1,28 @@
+--- 
+ 
+ 
+- name: Creates directory
+  file:
+    path: /var/www/react
+    state: directory
+
+- name: copy the content of the web site
+  copy:
+    src: ~/app/build/*
+    dest: /var/www/react
+
+    
+- name: copy the nginx config file 
+  copy:
+    src: ~/default
+    dest: /etc/nginx/sites-available/default
+  become: yes
+
+
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+

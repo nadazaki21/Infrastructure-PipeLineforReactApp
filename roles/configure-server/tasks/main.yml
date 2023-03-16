@@ -1,0 +1,32 @@
+---  
+
+- name: Update packages
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+
+- name: Install npm
+  apt:
+    name: npm
+    state: present
+
+- name: ensure nginx is at the latest version
+  apt: name=nginx state=latest
+
+
+- name: start nginx
+  service:
+      name: nginx
+      state: started
+
+
+- name: Install pm2
+  npm:
+    name: pm2
+    global: yes

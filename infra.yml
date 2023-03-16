@@ -1,0 +1,269 @@
+Description: 
+   InfraStructure for hosting the web application 
+
+Parameters:
+
+
+    VPCCIDR:
+      Description: Please enter the IP range (CIDR notation) for this
+      Type: String
+      Default: 10.0.0.0/16
+    
+
+    PubSubnetCIDR1:
+      Description: public subnet cidr block
+      Type: String
+    
+    PubSubnetCIDR2:
+      Description: public subnet cidr block
+      Type: String
+
+
+    AZ1:
+      Description: AZ subnet  1
+      Type: String
+
+    AZ2:
+      Description: AZ subnet 2
+      Type: String
+
+    ID:
+
+      Description: Unique Identifier
+      Type: String
+      Default: "1"
+
+
+
+
+
+
+Resources:
+
+  MainVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref VPCCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: "Main VPC"
+        
+
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: !Ref AZ1
+      CidrBlock: !Ref PubSubnetCIDR1
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref MainVPC  
+      Tags: 
+        - Key: Name
+          Value:  Public Subnet1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: !Ref AZ2
+      CidrBlock: !Ref PubSubnetCIDR2
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref MainVPC  
+      Tags: 
+        - Key: Name
+          Value:  Public Subnet2 
+          
+
+  InternetGW:
+    Type: AWS::EC2::InternetGateway
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MainVPC
+      InternetGatewayId: !Ref InternetGW  
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: "Pulic Route Table"
+      VpcId: !Ref MainVPC  # The route table cannot use the Internet Gateway until it has successfully attached to the VPC.
+
+  
+
+  AssociatePUBLIC1toRT:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+  
+  AssociatePUBLI2CtoRT:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  
+  
+  PublicInternetOutboundRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway #If you create a route that references an Internet Gateway in the same template where you create the Internet Gateway, you must declare a dependency on the Internet Gateway attachment.
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGW
+
+  
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      InstanceProfileName: EC2Instance
+      Roles: 
+        - "react"  
+
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allowing web requests and ssh connection with my public ip 
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # you can limit shh connection to your own public ip only 
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0    
+
+
+  LBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref MainVPC
+        
+      GroupDescription: Allow HTTP from anywhere, and HTTP to the Web Servers
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+    
+
+  TargetGroup:  
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref MainVPC
+      
+      Port: 80
+      Protocol: HTTP
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Tags: 
+        - Key: Identifier
+          Value: React-App Serevrs
+    
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name:  "LoadBalancer"
+      Subnets:
+        - !Ref PublicSubnet1  #try customzing these to customize the lb 
+        - !Ref PublicSubnet2
+      SecurityGroups:
+        - !Ref LBSecurityGroup
+      Tags: 
+        - Key: Name
+          Value: LBReact
+  
+
+  LBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/*"    # any pattern
+      ListenerArn: !Ref LBListener
+      Priority: 1
+
+
+
+Outputs:
+
+  VPC:
+    Description: VPC ID
+    Value: !Ref MainVPC
+    Export:
+      Name: "VPC"
+
+  PublicSubnet1:
+    Description: Public Subnet ID
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: "Public-Subnet1"
+
+  PublicSubnet2:
+    Description: Public Subnet ID
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: "Public-Subnet2"
+
+ 
+  EC2Security:
+    Description: Instances security rules 
+    Value: !Ref InstanceSecurityGroup
+    Export:
+      Name:  "InstanceSecurityGroup"
+
+  
+  EC2Profile:
+    Description: Instances security rules 
+    Value: !Ref  InstanceProfile
+    Export:
+      Name:  "EC2Profile"
+
+  
+  LoadBalancerDNSName:
+    Description: DNS Name of the web application
+    Value: !Join
+      - ""
+      - - "http://"
+        - !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: "ELB-DNS-Name"
+
+ 
+
+
+

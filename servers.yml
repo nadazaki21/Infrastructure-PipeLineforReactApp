@@ -1,0 +1,43 @@
+Description: 
+   Services reuired for the Webapp to be hosted 
+
+Parameters:
+
+
+  WorkflowID:
+      Description: An environment name that will be prefixed to resource names
+      Type: String
+  
+
+Resources:
+
+  EC21:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: t3.micro
+        ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
+        SecurityGroupIds:  
+          - Fn::ImportValue: InstanceSecurityGroup 
+        IamInstanceProfile:  !ImportValue EC2Profile 
+        SubnetId: !ImportValue "Public-Subnet1" 
+        Tags: 
+        - Key: Name
+          Value: "ec2-${WorkflowID}"
+
+
+  EC22:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0557a15b87f6559cf   #Ubuntu22 
+      SecurityGroupIds:  
+        - Fn::ImportValue: InstanceSecurityGroup 
+      IamInstanceProfile:  !ImportValue EC2Profile  
+      SubnetId:  !ImportValue "Public-Subnet2"
+      Tags: 
+        - Key: Name
+          Value: "ec2-${WorkflowID}"
+
+  
+
+       

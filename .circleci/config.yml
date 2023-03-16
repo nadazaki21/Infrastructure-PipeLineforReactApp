@@ -1,0 +1,274 @@
+version: 2.1
+
+commands:
+
+  destroy-enviroment:
+    steps:
+      - run:
+          name: Destroy infrasstructure 
+          when: on_fail
+          command: |
+            
+            aws cloudformation delete-stack --stack-name servers-${CIRCLE_WORKFLOW_ID:0:5}
+            
+  
+  destroy-bucket:
+    steps:
+      - run:
+          name: Destroy Bucket 
+          when: on_fail
+          command: |
+             aws s3 rm  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}  --recursive
+
+ 
+
+
+jobs:
+
+  create-instances:
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - checkout 
+      - run:
+          name: Create the instances  
+          command: |
+             aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
+      
+      - destroy-enviroment
+
+  create-bucket:
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - checkout 
+      - run:
+          name: Create  S3 Bucket 
+          command: |
+            aws cloudformation deploy --template-file s3bucket.yml   --stack-name "s3bucket-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"   --tags project=udapeople 
+            #A stack to be able to apply all of the s3bucket confuguartins that are in s3bucket.yml file, I would have used the cli ttool to craete the buckeyt but it will not take configurations 
+      
+      - destroy-bucket
+      - destroy-enviroment
+
+
+  store-app: #In S3 Bucket 
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - checkout 
+      - run:
+          name: put app files in the bucket 
+          command: |
+              aws s3 sync react-app s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}
+      
+      - destroy-bucket
+      - destroy-enviroment
+ 
+
+
+  confiugre-instaces:
+    docker:
+      - image: python:3.9-alpine3.16  #has no SSH 
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: 
+            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+
+      - run:
+          name: Add hosting Instace ip to ansible inventory
+          command: |
+           
+           echo "[web]" > ~/project/inv/inventory.txt
+           aws ec2 describe-instances    --query 'Reservations[*].Instances[*].PublicIpAddress'   --filters "Name=tag:Name,Values=ReactApp"    --output text >> ~/inventory.txt
+
+      - run: cat ~/inventory.txt
+
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache tar gzip
+            pip install ansible awscli
+            apk add openssh-client
+            
+      - run:
+          name: Configure server and install the node_exporter for Prometheus
+          command: |
+            ansible-playbook -i ~/inventory.txt  ~/configure-server.yml
+      
+      - run: 
+          name: ensure that nginx is runnign successsfully with its default web-page.
+          command: | 
+           URL = aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" 
+           echo ${URL}
+           if curl -s ${URL} | grep "Welcome"
+            then
+              echo "nginx is working successfully"
+                # Change this to 0 after the job fails
+              exit 0
+            else
+              exit 1
+            fi
+
+      - destroy-enviroment
+      - destroy-bucket
+
+  
+
+  fetch-app: #from S3 bucket
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: 
+            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+      - run:
+          name: Install awscli
+          command: |
+            sudo apt install -y tar gzip
+            echo "installing AWS CLI "
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+      - run:
+          name: Download the app file from S3Bucket
+          command: |
+              cd ~
+              aws s3 cp s3://react-gp23--${CIRCLE_WORKFLOW_ID:0:5}
+      
+
+      - destroy-bucket
+      - destroy-enviroment
+
+  build-app: #Produce node_modules and the 'Build' folder.
+    docker:
+    - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: 
+            - "57:3d:1b:ca:bb:bf:17:d8:38:c0:c8:30:fe:b7:14:40"
+
+      - run:
+          name: make sure that app files are available
+          command: |
+              ls -la ~
+      
+      - run: 
+          name: Produce node_modules folder
+          command: |
+            cd ~ 
+            npm install 
+            ls -la 
+
+      - run: 
+          name: Produce build folder
+          command: |
+            cd ~ 
+            npm run build
+            ls -la 
+      
+      - destroy-bucket
+      - destroy-enviroment
+  
+
+
+  #run-app: "npm build " " npm run start " # it runs when ngginx starts 
+
+  #make-website-available:
+
+  confiugre-nginx:
+  
+   
+  #restart-ngnix:
+  
+  run-pm2:
+
+
+  
+
+  #smoke-test:
+
+  cleanup:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout 
+      
+      # - attach_workspace:
+      #     at: ~/
+
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt install tar gzip
+            # install AWS CLI
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      
+
+      
+      - attach_workspace:
+          at: ~/
+                
+      - run:
+          name: Remove old stacks and files
+          command: |
+              OldWorkflowID=$(cat ~/OldWorkflowID.txt)
+              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                      --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+              echo Stack names: "${STACKS[@]}"
+              echo "${OldWorkflowID}"
+              echo " current workflow id : ${CIRCLE_WORKFLOW_ID:0:5}"      
+              
+
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              then
+                echo "------------------ Deleting old Envirments ------------------"
+                aws cloudformation delete-stack --stack-name "asg-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "s3bucket-${OldWorkflowID}"
+                
+            
+                
+              else
+                echo "------------------ Nothing to Delete/Can't Delete ------------------"  
+              fi
+              
+
+              
+              
+    
+  # domain name 
+
+
+workflows:
+  default:
+    jobs:
+      - create-bucket
+     
+
+      # - confiugre-instaces:
+      #     requires: [deploy-infrastructure]
+      
+      - store-app:
+          requires: [create-bucket]
+      - deploy-infrastructure:
+          requires: [store-app]
+      - cleanup:
+          requires: [deploy-infrastructure]
+      # - fetch-app:
+      #     requires: [deploy-infrastructure , store-app ]
+      # - build-app:
+      #     requires: [fetch-app ]
+      
+
+
+     
+
+      
+
+      
