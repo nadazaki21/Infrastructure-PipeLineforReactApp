@@ -1,11 +1,7 @@
 --- 
  
 
-- name: start nginx
-  service:
-      name: nginx
-      state: started
-  become: yes
+
   
 - name: Creates directory
   file:
@@ -24,11 +20,11 @@
     dest: /etc/nginx/sites-available/default
   become: yes
   
-- name: restart nginx
-  service:
-    name: nginx
-    state: restarted
-  become: yes
+# - name: restart nginx
+#   service:
+#     name: nginx
+#     state: restarted
+#   become: yes
 
 #/home/circleci/project/react-app/app/build/* 
 
