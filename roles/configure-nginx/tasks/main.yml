@@ -8,13 +8,13 @@
 
 - name: copy the content of the web site
   copy:
-    src: ~/app/build/*
+    src: /home/circleci/project/react-app/app/build/*
     dest: /var/www/react
 
     
 - name: copy the nginx config file 
   copy:
-    src: ~/roles/configure-nginx/files/default
+    src: /home/circleci/project/roles/configure-nginx/files/default
     dest: /etc/nginx/sites-available/default
   become: yes
 
