@@ -17,7 +17,7 @@
     src: /home/circleci/project/roles/configure-nginx/files/default
     dest: /etc/nginx/sites-available/default
   become: yes
-  force: yes
+  
 
 
 - name: restart nginx
