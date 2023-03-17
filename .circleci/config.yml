@@ -222,6 +222,7 @@ jobs:
           paths: 
             - /home/circleci/project/react-app/app/build
 
+      - run: ls -la /home/circleci/project/react-app/app
       
       - destroy-bucket
       - destroy-enviroment
@@ -253,6 +254,8 @@ jobs:
       - restore_cache:
           keys: 
             - build-dir-r
+
+      - run: ls -la /home/circleci/project/react-app/app
       
       - run: pwd 
       - run: ls -la
