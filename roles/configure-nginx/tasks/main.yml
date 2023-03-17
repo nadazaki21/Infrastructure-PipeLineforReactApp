@@ -28,18 +28,24 @@
 
 
 - name: Reload services with systemd
-      systemd:
-        name: nginx.service
-        state: reloaded
-
+  systemd:
+    name: nginx.service
+    state: reloaded
 
 - name: name pm2 process
-   command: 'pm2 start apt --name app '
+  command: 'sudo systemctl restart nginx '
+  become: yes
+
+- name: name pm2 process
+  command: 'pm2 start apt --name app '
+  become: yes
 
 
 - name: start pm2 process
-   command: 'pm2 startup systemd'
+  command: 'pm2 startup systemd'
+  become: yes
 
 - name: restart pm2 process
-   command: 'pm2 restart app'
+  command: 'pm2 restart app'
+  become: yes
 

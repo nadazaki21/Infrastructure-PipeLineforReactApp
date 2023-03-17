@@ -39,7 +39,7 @@ jobs:
           command: |
              aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
       
-      - destroy-bucket
+      
       - destroy-enviroment
 
   # create-bucket:
@@ -125,7 +125,7 @@ jobs:
       #       fi
       
       # - destroy-bucket
-      # - destroy-enviroment
+      - destroy-enviroment
       
       
 
@@ -224,7 +224,7 @@ jobs:
 
       - run: ls -la /home/circleci/project/react-app/app/build
 
-      - destroy-bucket
+      
       - destroy-enviroment
   
 
@@ -278,7 +278,7 @@ jobs:
           command: |
             ansible-playbook -i /home/circleci/project/inventory.txt  /home/circleci/project/configure-nginx.yml
 
-      - destroy-bucket
+     
       - destroy-enviroment
 
 
