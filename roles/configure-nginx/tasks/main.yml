@@ -8,7 +8,7 @@
 
 - name: copy the content of the web site
   copy:
-    src: /home/circleci/project/react-app/app/build/*
+    src:   react-app/app
     dest: /var/www/react
 
     
@@ -24,3 +24,4 @@
     state: restarted
   become: yes
 
+#/home/circleci/project/react-app/app/build/* 
