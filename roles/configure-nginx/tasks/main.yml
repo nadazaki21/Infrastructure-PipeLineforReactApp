@@ -28,8 +28,8 @@
     state: reloaded
 
 
-- name : chage dir to dir of the react app to bbe abble to confiure pm2 with it 
-  chdir: /etc/nginx/sites-available
+# - name : chage dir to dir of the react app to bbe abble to confiure pm2 with it 
+#   chdir: ' /etc/nginx/sites-available '
 
  
 # - name: name pm2 process
@@ -39,13 +39,20 @@
 
 - name: start pm2 process
   command: 'pm2 startup systemd'
+    args:
+         chdir: "/etc/nginx/sites-available"
+
   become: yes
 
 - name: name pm2 process
   command: 'pm2 start apt --name app '
+    args:
+         chdir: "/etc/nginx/sites-available"
   become: yes
 
 - name: restart pm2 process
   command: 'pm2 restart app'
+    args:
+         chdir: "/etc/nginx/sites-available"
   become: yes
 
