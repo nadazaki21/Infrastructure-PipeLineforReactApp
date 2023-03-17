@@ -26,6 +26,24 @@
 #     state: restarted
 #   become: yes
 
+
+- name: Reload services with systemd
+      systemd:
+        name: nginx.service
+        state: reloaded
+
+
+- name: name pm2 process
+   command: 'pm2 start apt --name app '
+
+
+- name: start pm2 process
+   command: 'pm2 startup systemd'
+
+- name: restart pm2 process
+   command: 'pm2 restart app'
+
+
 #/home/circleci/project/react-app/app/build/* 
 
 ##/home/circleci/project/react-app/app
