@@ -1,6 +1,12 @@
 --- 
  
- 
+
+- name: start nginx
+  service:
+      name: nginx
+      state: started
+  become: yes
+  
 - name: Creates directory
   file:
     path: /var/www/react
@@ -18,8 +24,6 @@
     dest: /etc/nginx/sites-available/default
   become: yes
   
-
-
 - name: restart nginx
   service:
     name: nginx
