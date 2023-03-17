@@ -175,6 +175,15 @@ jobs:
     steps:
       - checkout
       - run : echo ${CI}
+
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt install software-properties-common 
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible 
+
+      - run: ansible --version 
       - run:
           name: Install awscli
           command: |
@@ -230,12 +239,19 @@ jobs:
           fingerprints: 
             - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
             
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt install software-properties-common 
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible 
 
+      - run: ansible --version 
       - run:
           name: Install dependencies
           command: |
             sudo apt install  tar gzip
-            sudo apt install ansible awscli
+            sudo apt install  awscli
             
       
       - restore_cache:
