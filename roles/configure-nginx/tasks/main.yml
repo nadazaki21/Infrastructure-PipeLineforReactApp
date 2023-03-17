@@ -29,7 +29,7 @@
 
 
 - name : chage dir to dir of the react app to bbe abble to confiure pm2 with it 
-  command: ' cd /etc/nginx/sites-available '
+  command: ' cd /etc/nginx '
 
  
 # - name: name pm2 process
