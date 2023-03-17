@@ -238,11 +238,10 @@ jobs:
           fingerprints: 
             - "1d:8b:bf:3b:d9:1c:29:10:e5:2c:04:90:99:02:24:7a"
             
-      - run:
+       - run:
           name: Install Ansible
           command: |
-            sudo apt install software-properties-common 
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt-get update 
             sudo apt install ansible 
 
       - run: ansible --version 
