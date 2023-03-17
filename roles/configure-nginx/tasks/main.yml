@@ -20,11 +20,6 @@
     dest: /etc/nginx/sites-available/default
   become: yes
   
-# - name: restart nginx
-#   service:
-#     name: nginx
-#     state: restarted
-#   become: yes
 
 
 - name: Reload services with systemd
@@ -32,17 +27,23 @@
     name: nginx.service
     state: reloaded
 
-- name: name pm2 process
-  command: 'sudo systemctl restart nginx '
-  become: yes
 
-- name: name pm2 process
-  command: 'pm2 start apt --name app '
-  become: yes
+- name : chage dir to dir of the react app to bbe abble to confiure pm2 with it 
+  command: cd 
+    chdir: /etc/nginx/sites-available
+
+ 
+# - name: name pm2 process
+#   command: 'sudo systemctl restart nginx '
+#   become: yes
 
 
 - name: start pm2 process
   command: 'pm2 startup systemd'
+  become: yes
+
+- name: name pm2 process
+  command: 'pm2 start apt --name app '
   become: yes
 
 - name: restart pm2 process
