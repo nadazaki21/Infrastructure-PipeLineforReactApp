@@ -302,7 +302,7 @@ jobs:
           name: front end smoke test.
           command: |
             
-            URL= aws elbv2 describe-load-balancers          
+            URL= aws elbv2 describe-load-balancers  --query LoadBalancers[*].DNSName         
             echo ${URL} 
             if curl -s ${URL} | grep "200"
             then
