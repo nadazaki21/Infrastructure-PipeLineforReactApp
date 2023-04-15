@@ -281,12 +281,41 @@ jobs:
      
       - destroy-enviroment
 
-
-  
-  # run-pm2:
   
 
-  # #smoke-test:
+   smoke-test:  
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # install AWS CLI
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+      - run:
+          name: front end smoke test.
+          command: |
+            
+            URL= aws elbv2 describe-load-balancers          
+            echo ${URL} 
+            if curl -s ${URL} | grep "200"
+            then
+              echo "Frontend is working successfully"
+               
+              exit 0
+            else
+              exit 1
+            fi
+
+
+      
+      - destroy-environment
+
+
 
   cleanup:
     docker:
@@ -351,6 +380,8 @@ workflows:
           #requires: [fetch-app]
       - configure-nginx:
           requires: [confiugre-instaces , build-app ]
+      - smoke-test:
+          requires: [configure-nginx]
      
 
       
