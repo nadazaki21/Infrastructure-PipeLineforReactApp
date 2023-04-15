@@ -302,9 +302,13 @@ jobs:
           name: front end smoke test.
           command: |
             
-            DNS= aws elbv2 describe-load-balancers  --query LoadBalancers[*].DNSName 
-            URL = http://${DNS}        
-            echo ${URL} 
+            export DNS=$(aws elbv2 describe-load-balancers  --query LoadBalancers[*].DNSName --output text) 
+
+            echo ${DNS}
+
+            URL="http://${DNS}"
+
+            echo ${URL}  
             if curl -s ${URL} | grep "200"
             then
               echo "Frontend is working successfully"
