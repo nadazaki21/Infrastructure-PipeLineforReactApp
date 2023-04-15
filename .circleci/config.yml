@@ -5,7 +5,7 @@ commands:
   destroy-enviroment:
     steps:
       - run:
-          name: Destroy infrasstructure 
+          name: Destroy Enviroment 
           when: on_fail
           command: |
             
@@ -302,7 +302,8 @@ jobs:
           name: front end smoke test.
           command: |
             
-            URL= aws elbv2 describe-load-balancers  --query LoadBalancers[*].DNSName         
+            DNS= aws elbv2 describe-load-balancers  --query LoadBalancers[*].DNSName 
+            URL = http://${DNS}        
             echo ${URL} 
             if curl -s ${URL} | grep "200"
             then
