@@ -314,7 +314,7 @@ jobs:
 
 
       
-      - destroy-environment
+      - destroy-enviroment
 
 
 
