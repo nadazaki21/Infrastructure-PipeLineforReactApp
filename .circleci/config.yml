@@ -29,8 +29,9 @@ jobs:
       - run:
               name: Get old stack workflow id and Save it
               command: |
+                x=WorkflowID*
                 export OldWorkflowID=$(aws cloudformation \
-                        list-exports --query "Exports[?Name=="WorkflowID*"].Value"  --no-paginate --output text)
+                        list-exports --query "Exports[?Name== ${x} ].Value"  --no-paginate --output text)
 
                       
                 echo OldWorkflowID: "${OldWorkflowID}"
