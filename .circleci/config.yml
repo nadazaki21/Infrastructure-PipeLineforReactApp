@@ -27,17 +27,15 @@ jobs:
           command: |
             yum install -y tar gzip
       - run:
-              name: Get old stack workflow id and Save it
-              command: |
-                x=WorkflowID
-                export OldWorkflowID=$(aws cloudformation \
-                        list-exports --query "Exports[?Name=~ ${x} ].Value"  --no-paginate --output text)
+          name: Get old stack workflow id and Save it
+          command: |
 
-                      
-                echo OldWorkflowID: "${OldWorkflowID}"
-                echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:5}"
-                echo $OldWorkflowID > ~/OldWorkflowID.txt
-                
+                OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?contains(Name, 'Workflow')].Value" --no-paginate --output text)
+                echo $OldWorkflowID > ~/OldWorkflowID.txt     
+                echo "OldWorkflowID  is  ${OldWorkflowID}"
+                echo Current_CIRCLE_WORKFLOW_ID is  "${CIRCLE_WORKFLOW_ID:0:5}"
+
+
       - persist_to_workspace:
           root: ~/
           paths:
