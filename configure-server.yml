@@ -16,7 +16,7 @@
 
     - name: "wait 150 seconds for target connection to become reachable/usable."
       pause:
-        seconds: 150     # 120 seconds is enough
+        seconds: 180     # 120 seconds is enough
 
 
     - name: Install Python
