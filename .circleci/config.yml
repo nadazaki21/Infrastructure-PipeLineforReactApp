@@ -229,6 +229,10 @@ jobs:
       - image: amazon/aws-cli 
     steps:
       - run:
+          name: Install tar 
+          command: |
+            sudo apt install -y tar gzip
+      - run:
               name: Get old stack workflow id and Save it
               command: |
                 export OldWorkflowID=$(aws cloudformation \
@@ -324,9 +328,9 @@ jobs:
               if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
               then
                 echo "------------------ Deleting old Envirments ------------------"
-                aws cloudformation delete-stack --stack-name "asg-${OldWorkflowID}"
-                aws cloudformation delete-stack --stack-name "s3bucket-${OldWorkflowID}"
-                
+    
+                 
+                aws cloudformation delete-stack --stack-name servers-${OldWorkflowID}
             
                 
               else
