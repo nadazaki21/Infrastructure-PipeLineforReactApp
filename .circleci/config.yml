@@ -53,6 +53,10 @@ jobs:
       
       - run: cat ~/OldWorkflowID.txt
 
+
+
+
+
   create-instances:
     docker:
       - image: amazon/aws-cli 
@@ -70,6 +74,8 @@ jobs:
       - destroy-enviroment
 
  
+
+
   confiugre-instaces:
     docker:
       - image: python:3.9-alpine3.16  #has no SSH 
@@ -111,6 +117,9 @@ jobs:
       - destroy-enviroment
 
       
+
+
+
   access-server: # test if web app is available on server 
     docker:
       - image: amazon/aws-cli 
@@ -196,6 +205,9 @@ jobs:
       
       - destroy-enviroment
   
+
+
+
 
   configure-nginx:
     docker:
