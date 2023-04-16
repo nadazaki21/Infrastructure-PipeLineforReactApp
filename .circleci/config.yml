@@ -117,7 +117,19 @@ jobs:
       - run : 
           name: ensure that nginx is runnign successsfully with its default web-page.
           command: | 
-           URL=$(aws ec2 describe-instances  --query 'Reservations[].Instances[0].PublicDnsName'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}" --output text | head -1) 
+
+           # Assign the output of the describe-instances command to a variable
+            instances=$(aws ec2 describe-instances --query 'Reservations[].Instances[].PublicDnsName' --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}" --output text)
+
+            # Use cut to extract the first public DNS name and assign it to a variable
+            dns_name_1=$(echo "$instances" | cut -d ' ' -f1)
+
+            # Use cut to extract the second public DNS name and assign it to a variable
+            dns_name_2=$(echo "$instances" | cut -d ' ' -f2)
+
+           #URL=$(aws ec2 describe-instances  --query 'Reservations[].Instances[0].PublicDnsName'   --filters "Name=tag:Name,Values=ec2-${CIRCLE_WORKFLOW_ID:0:5}" --output text | head -1) 
+           
+           URL=${dns_name_1}
            echo ${URL}
            if curl -s ${URL} | grep "200"
             then
