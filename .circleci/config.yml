@@ -231,7 +231,7 @@ jobs:
       - run:
           name: Install tar 
           command: |
-            sudo apt install -y tar gzip
+            yum install -y tar gzip
       - run:
               name: Get old stack workflow id and Save it
               command: |
