@@ -119,7 +119,7 @@ jobs:
       - run : 
           name: ensure that nginx is runnign successsfully with its default web-page.
           command: | 
-           URL=$(aws ec2 describe-instances  --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ec2-${WorkflowID}" --output text) 
+           URL=$(aws ec2 describe-instances  --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ec2--${CIRCLE_WORKFLOW_ID:0:5}" --output text) 
            echo ${URL}
            if curl -s ${URL} | grep "200"
             then
