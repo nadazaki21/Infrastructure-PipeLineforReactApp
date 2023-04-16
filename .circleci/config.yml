@@ -108,8 +108,6 @@ jobs:
 
       
 
-
-
   access-server: # test if web app is available on server 
     docker:
       - image: amazon/aws-cli 
