@@ -26,6 +26,33 @@ commands:
 
 jobs:
 
+  get-current-workflow-id:
+    docker:
+      - image: amazon/aws-cli 
+    steps:
+      - run:
+          name: Install tar 
+          command: |
+            yum install -y tar gzip
+      - run:
+              name: Get old stack workflow id and Save it
+              command: |
+                export OldWorkflowID=$(aws cloudformation \
+                        list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                        --no-paginate --output text)
+
+                      
+                echo OldWorkflowID: "${OldWorkflowID}"
+                echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:5}"
+                echo $OldWorkflowID > ~/OldWorkflowID.txt
+                
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - OldWorkflowID.txt
+      
+      - run: cat ~/OldWorkflowID.txt
+
   create-instances:
     docker:
       - image: amazon/aws-cli 
@@ -224,33 +251,7 @@ jobs:
       - destroy-enviroment
 
   
-  get-current-workflow-id:
-    docker:
-      - image: amazon/aws-cli 
-    steps:
-      - run:
-          name: Install tar 
-          command: |
-            yum install -y tar gzip
-      - run:
-              name: Get old stack workflow id and Save it
-              command: |
-                export OldWorkflowID=$(aws cloudformation \
-                        list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-                        --no-paginate --output text)
-
-                      
-                echo OldWorkflowID: "${OldWorkflowID}"
-                echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:5}"
-                echo $OldWorkflowID > ~/OldWorkflowID.txt
-                
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - OldWorkflowID.txt
-      
-      - run: cat ~/OldWorkflowID.txt
-
+  
 
 
   smoke-test:  
@@ -342,7 +343,10 @@ jobs:
 workflows:
   default:
     jobs:
+
+      - get-current-workflow-id
       - create-instances
+          requires: [get-current-workflow-id]
     
       - confiugre-instaces:
           requires: [create-instances]
@@ -353,7 +357,7 @@ workflows:
       - configure-nginx:
           requires: [confiugre-instaces , build-app ]
 
-      - get-current-workflow-id
+      
       # - smoke-test:
       #     requires: [configure-nginx]
 
