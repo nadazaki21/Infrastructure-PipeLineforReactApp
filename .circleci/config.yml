@@ -352,7 +352,7 @@ workflows:
     
       # - confiugre-instaces:
       #     requires: [create-instances]
-      - access-server
+      - access-server:
           requires: [create-instances]
       - build-app
          
