@@ -345,6 +345,7 @@ workflows:
     jobs:
 
       - get-current-workflow-id
+
       - create-instances
           requires: [get-current-workflow-id]
     
@@ -362,7 +363,7 @@ workflows:
       #     requires: [configure-nginx]
 
       - cleanup: 
-          requires: [  get-current-workflow-id ]
+          requires: [ create-instances ]
      
 
       
