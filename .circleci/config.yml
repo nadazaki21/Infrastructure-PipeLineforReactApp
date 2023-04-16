@@ -346,7 +346,7 @@ workflows:
 
       - get-current-workflow-id
 
-      - create-instances
+      - create-instances:
           requires: [get-current-workflow-id]
     
       - confiugre-instaces:
