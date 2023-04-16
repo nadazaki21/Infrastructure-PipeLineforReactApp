@@ -46,4 +46,4 @@ Outputs:
     Value: !Sub ${WorkflowID}
     Description: Work flow number of this stack 
     Export:
-      Name: WorkflowID
+      Name: !Sub WorkflowID-${WorkflowID}
