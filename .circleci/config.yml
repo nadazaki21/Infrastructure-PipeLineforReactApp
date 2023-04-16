@@ -341,8 +341,6 @@ jobs:
               if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
               then
                 echo "------------------ Deleting old Envirments ------------------"
-    
-                 
                 aws cloudformation delete-stack --stack-name servers-${OldWorkflowID}
             
                 
