@@ -42,37 +42,7 @@ jobs:
       
       - destroy-enviroment
 
-  # create-bucket:
-  #   docker:
-  #     - image: amazon/aws-cli 
-  #   steps:
-  #     - checkout 
-  #     - run:
-  #         name: Create  S3 Bucket 
-  #         command: |
-  #           aws cloudformation deploy --template-file s3bucket.yml   --stack-name "s3bucket-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"   --tags project=udapeople 
-  #           #A stack to be able to apply all of the s3bucket confuguartins that are in s3bucket.yml file, I would have used the cli ttool to craete the buckeyt but it will not take configurations 
-      
-  #     - destroy-bucket
-  #     - destroy-enviroment
-
-
-
-  # store-app: #In S3 Bucket 
-  #   docker:
-  #     - image: amazon/aws-cli 
-  #   steps:
-  #     - checkout 
-  #     - run:
-  #         name: put app files in the bucket 
-  #         command: |
-  #             aws s3 sync react-app s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}
-      
-  #     - destroy-bucket
-  #     - destroy-enviroment
  
-
-
   confiugre-instaces:
     docker:
       - image: python:3.9-alpine3.16  #has no SSH 
@@ -111,60 +81,31 @@ jobs:
           command: |
             ansible-playbook -i /root/project/inventory.txt  /root/project/configure-server.yml
       
-      # - run: 
-      #     name: ensure that nginx is runnign successsfully with its default web-page.
-      #     command: | 
-      #      URL = aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" 
-      #      echo ${URL}
-      #      if curl -s ${URL} | grep "Welcome"
-      #       then
-      #         echo "nginx is working successfully"
-      #           # Change this to 0 after the job fails
-      #         exit 0
-      #       else
-      #         exit 1
-      #       fi
-      
-      # - destroy-bucket
       - destroy-enviroment
+
       
-      
+  access-server: # test if web app is available on server 
+    docker:
+      - image: amazon/aws-cli 
+     
+    steps:
+      - checkout 
+      - run : 
+          name: ensure that nginx is runnign successsfully with its default web-page.
+          command: | 
+           URL = aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" --output text 
+           echo ${URL}
+           if curl -s ${URL} | grep "200"
+            then
+              echo "nginx is working successfully and web app is available "
+                
+              exit 0
+            else
+              exit 1
+            fi
+
 
   
-
-  # fetch-app: #from S3 bucket
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-      
-  #     - run:
-  #         name: Install awscli
-  #         command: |
-  #           sudo apt install -y tar gzip
-  #           echo "installing AWS CLI "
-  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  #           unzip awscliv2.zip
-  #           sudo ./aws/install
-
-  #     - run:
-  #         name: Download the app file from S3Bucket
-  #         command: |
-  #             cd ~
-  #             mkdir react
-  #             aws s3 sync  s3://react-gp23-${CIRCLE_WORKFLOW_ID:0:5}   ~/react
-
-      
-  #     - run: pwd 
-  #     - run: ls -la 
-  #     - run: ls -la   ~/react
-  #     - save_cache:
-  #         key: app
-  #         paths: 
-  #           - ~/react
-
-  #     - destroy-bucket
-  #     - destroy-enviroment
 
 
 
@@ -283,6 +224,30 @@ jobs:
       - destroy-enviroment
 
   
+  get-current-workflow-id:
+    docker:
+      - image: amazon/aws-cli 
+
+      - run:
+              name: Get old stack workflow id and Save it
+              command: |
+                export OldWorkflowID=$(aws cloudformation \
+                        list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                        --no-paginate --output text)
+
+                      
+                echo OldWorkflowID: "${OldWorkflowID}"
+                echo Current_CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:5}"
+                echo $OldWorkflowID > ~/OldWorkflowID.txt
+                
+          - persist_to_workspace:
+              root: ~/
+              paths:
+                - OldWorkflowID.txt
+          
+          - run: cat ~/OldWorkflowID.txt
+
+
 
   smoke-test:  
 
@@ -330,8 +295,6 @@ jobs:
     steps:
       - checkout 
       
-      # - attach_workspace:
-      #     at: ~/
 
       - run:
           name: Install dependencies
@@ -376,19 +339,22 @@ workflows:
   default:
     jobs:
       - create-instances
-      #- create-bucket
-      #- store-app:
-          #requires: [create-bucket]
+    
       - confiugre-instaces:
           requires: [create-instances]
-      #- fetch-app: 
-          #requires: [store-app]
+      - access-server:
+          requires: [confiugre-instaces]
       - build-app
-          #requires: [fetch-app]
+         
       - configure-nginx:
           requires: [confiugre-instaces , build-app ]
-      - smoke-test:
-          requires: [configure-nginx]
+
+      - get-current-workflow-id
+      # - smoke-test:
+      #     requires: [configure-nginx]
+
+      - cleanup: 
+          requires: [  get-current-workflow-id ]
      
 
       
