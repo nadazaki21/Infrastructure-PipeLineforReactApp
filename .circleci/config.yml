@@ -353,7 +353,7 @@ workflows:
       # - confiugre-instaces:
       #     requires: [create-instances]
       - access-server
-          #requires: [confiugre-instaces]
+          requires: [create-instances]
       - build-app
          
       # - configure-nginx:
@@ -369,6 +369,6 @@ workflows:
 
       
 
-      
+
 
       
