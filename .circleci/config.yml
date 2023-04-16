@@ -227,7 +227,7 @@ jobs:
   get-current-workflow-id:
     docker:
       - image: amazon/aws-cli 
-
+    steps:
       - run:
               name: Get old stack workflow id and Save it
               command: |
