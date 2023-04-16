@@ -121,7 +121,7 @@ jobs:
       - run : 
           name: ensure that nginx is runnign successsfully with its default web-page.
           command: | 
-           URL=$(aws ec2 describe-instances - --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" --output text) 
+           URL=$(aws ec2 describe-instances  --query 'Reservations[].Instances[].PublicDnsName'   --filters "Name=tag:Name,Values=ReactApp" --output text) 
            echo ${URL}
            if curl -s ${URL} | grep "200"
             then
