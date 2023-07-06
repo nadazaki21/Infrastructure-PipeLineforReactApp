@@ -12,10 +12,6 @@ commands:
             aws cloudformation delete-stack --stack-name servers-${CIRCLE_WORKFLOW_ID:0:5}
             
             
-  
- 
-
-
 jobs:
 
   get-current-workflow-id:
@@ -374,7 +370,6 @@ workflows:
      
 
       
-
 
 
       
