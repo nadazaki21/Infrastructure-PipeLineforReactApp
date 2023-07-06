@@ -140,7 +140,7 @@ jobs:
 
   build-app: #Produce node_modules and the 'Build' folder.
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:13-buster
     environment:
       CI: false 
     steps:
