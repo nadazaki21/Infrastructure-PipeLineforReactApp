@@ -219,10 +219,18 @@ jobs:
             - "80:98:a1:f8:7f:63:34:db:ff:ac:64:b0:4b:17:55:99"
             
       - run:
+          name: Update repository configurations
+          command: |
+            echo "deb http://deb.debian.org/debian buster main" | sudo tee /etc/apt/sources.list
+            echo "deb http://security.debian.org/debian-security buster/updates main" | sudo tee -a /etc/apt/sources.list
+            echo "deb http://deb.debian.org/debian buster-updates main" | sudo tee -a /etc/apt/sources.list
+            sudo apt-get update
+      - run:
           name: Install Ansible
           command: |
-            sudo apt-get update 
-            sudo apt install ansible 
+           sudo apt-get update
+            sudo apt-get install -y python3-pip
+            sudo pip3 install ansible 
 
       - run: ansible --version 
       - run:
