@@ -375,12 +375,9 @@ workflows:
       - configure-nginx:
           requires: [confiugre-instaces , build-app ]
 
-      
-      # - smoke-test:
-      #     requires: [configure-nginx]
-
+  
       - cleanup: 
-          requires: [ create-instances ]
+          requires: [ create-instances , configure-nginx ]
      
 
       
