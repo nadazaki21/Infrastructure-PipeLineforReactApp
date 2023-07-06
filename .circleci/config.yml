@@ -377,7 +377,7 @@ workflows:
 
   
       - cleanup: 
-          requires: [ create-instances , configure-nginx ]
+          requires: [ configure-nginx ]
      
 
       
