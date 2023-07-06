@@ -148,6 +148,13 @@ jobs:
       - run : echo ${CI}
 
       - run:
+          name: Update repository configurations
+          command: |
+            echo "deb http://deb.debian.org/debian buster main" | sudo tee /etc/apt/sources.list
+            echo "deb http://security.debian.org/debian-security buster/updates main" | sudo tee -a /etc/apt/sources.list
+            echo "deb http://deb.debian.org/debian buster-updates main" | sudo tee -a /etc/apt/sources.list
+            sudo apt-get update
+      - run:
           name: Install Ansible
           command: |
            sudo apt-get update
