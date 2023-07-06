@@ -271,7 +271,6 @@ jobs:
       - destroy-enviroment
 
   
-  
 
 
   smoke-test:  
