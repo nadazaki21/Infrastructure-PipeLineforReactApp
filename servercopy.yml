@@ -41,8 +41,8 @@ Resources:
   LBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: 
-        - Fn::ImportValue: VPC
+      VpcId:  !ImportValue "VPC"
+        
         
       GroupDescription: Allow HTTP from anywhere, and HTTP to the Web Servers
       SecurityGroupIngress:
@@ -59,8 +59,8 @@ Resources:
   TargetGroup:  
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      VpcId: 
-        - Fn::ImportValue: VPC
+      VpcId: !ImportValue "VPC"
+        
       
       Port: 80
       Protocol: HTTP

@@ -14,7 +14,7 @@ commands:
             
 jobs:
 
-  get-current-workflow-id:
+  get-workflow-ids:
     docker:
       - image: amazon/aws-cli 
     steps:
@@ -363,10 +363,10 @@ workflows:
   default:
     jobs:
 
-      - get-current-workflow-id
+      - get-workflow-ids
 
       - create-instances:
-          requires: [get-current-workflow-id]
+          requires: [get-workflow-ids]
     
       - confiugre-instaces:
           requires: [create-instances]
