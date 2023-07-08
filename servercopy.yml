@@ -65,10 +65,10 @@ Resources:
       Port: 80
       Protocol: HTTP
       HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 10
+      HealthCheckIntervalSeconds: 20
       HealthCheckPath: /
       HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 8
+      HealthCheckTimeoutSeconds: 15
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 5
       Tags: 
@@ -81,7 +81,7 @@ Resources:
     Properties:
       Name:  "LoadBalancer"
       Subnets:
-        - Fn::ImportValue: Public-Subnet1 #try customzing these to customize the lb 
+        - Fn::ImportValue: Public-Subnet1 
         - Fn::ImportValue: Public-Subnet2
       SecurityGroups:
         - !Ref LBSecurityGroup
