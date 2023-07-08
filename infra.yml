@@ -189,7 +189,31 @@ Resources:
           FromPort: 0
           ToPort: 65535
           CidrIp: 0.0.0.0/0    
+  
 
+  MonitoringSeversSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allowing web requests and ssh connection with my public ip 
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # you can limit shh connection to your own public ip only 
+        - IpProtocol: tcp
+          FromPort: 9090   # For prometheus 
+          ToPort: 9090
+          CidrIp: 0.0.0.0/0 
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0   
 
   LBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -293,24 +317,34 @@ Outputs:
     Export:
       Name:  "InstanceSecurityGroup"
 
-  
-  # EC2Profile:
-  #   Description: Instances security rules 
-  #   Value: !Ref  InstanceProfile
-  #   Export:
-  #     Name:  "EC2Profile"
-
-  
-  LoadBalancerDNSName:
-    Description: DNS Name of the web application
-    Value: !Join
-      - ""
-      - - "http://"
-        - !GetAtt LoadBalancer.DNSName
+  MonitoringSerevrsSecurity:
+    Description:  MOnitoring Instances security rules 
+    Value: !Ref MonitoringSeversSecurityGroup
     Export:
-      Name: "ELB-DNS-Name"
+      Name:  "MonitoringSeversSecurityGroup"
 
- 
+  
+  # LBSecurityGroup:
+  #   Description:  LB security rules 
+  #   Value: !Ref LBSecurityGroup
+  #   Export:
+  #     Name:  "LBSecurityGroup"
+
+
+
+
+  
+  # LoadBalancerDNSName:
+  #   Description: DNS Name of the web application
+  #   Value: !Join
+  #     - ""
+  #     - - "http://"
+  #       - !GetAtt LoadBalancer.DNSName
+  #   Export:
+  #     Name: "ELB-DNS-Name"
+
+  
+
 
 
 
