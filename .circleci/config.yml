@@ -55,7 +55,7 @@ jobs:
           name: Create the instances  
           command: |
              
-             aws cloudformation deploy --template-file server.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
+             aws cloudformation deploy --template-file servers.yml   --stack-name "servers-${CIRCLE_WORKFLOW_ID:0:5}"  --parameter-overrides  WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}   --tags project=react 
       
       
       - destroy-enviroment
