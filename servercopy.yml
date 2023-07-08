@@ -1,0 +1,139 @@
+Description: 
+   Services required for the Webapp to be hosted 
+
+Parameters:
+
+  WorkflowID:
+      Description: An environment name that will be prefixed to resource names
+      Type: String
+  
+
+Resources:
+
+  EC21:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf  #Ubuntu22 
+      SecurityGroupIds:  
+        - Fn::ImportValue: InstanceSecurityGroup 
+      SubnetId: !ImportValue "Public-Subnet1" 
+      KeyName:  "nada"
+      Tags: 
+        - Key: Name
+          Value: !Sub "ec2-${WorkflowID}"
+
+
+  EC22:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf   #Ubuntu22 
+      SecurityGroupIds:  
+        - Fn::ImportValue: InstanceSecurityGroup 
+      SubnetId:  !ImportValue "Public-Subnet2"
+      KeyName: "nada"
+      Tags: 
+        - Key: Name
+          Value: !Sub "ec2-${WorkflowID}"
+
+  
+  LBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: 
+        - Fn::ImportValue: VPC
+        
+      GroupDescription: Allow HTTP from anywhere, and HTTP to the Web Servers
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # you can limit shh connection to your own public ip only 
+    
+
+  TargetGroup:  
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: 
+        - Fn::ImportValue: VPC
+      
+      Port: 80
+      Protocol: HTTP
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Tags: 
+        - Key: Identifier
+          Value: React-App Serevrs
+    
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name:  "LoadBalancer"
+      Subnets:
+        - Fn::ImportValue: Public-Subnet1 #try customzing these to customize the lb 
+        - Fn::ImportValue: Public-Subnet2
+      SecurityGroups:
+        - !Ref LBSecurityGroup
+      Tags: 
+        - Key: Name
+          Value: LBReact
+  
+
+  LBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/*"    # any pattern
+      ListenerArn: !Ref LBListener
+      Priority: 1
+
+
+  
+
+ 
+Outputs:
+ 
+ 
+  WorkflowID:
+    Value: !Sub ${WorkflowID}
+    Description: Work flow number of this stack 
+    Export:
+      Name: !Sub WorkflowID-${WorkflowID}
+
+
+  
+  
+  LoadBalancerDNSName:
+    Description: DNS Name of the web application
+    Value: !Join
+      - ""
+      - - "http://"
+        - !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: "ELB-DNS-Name"
