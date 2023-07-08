@@ -263,7 +263,6 @@ Outputs:
 
   
 
-  
   # LoadBalancerDNSName:
   #   Description: DNS Name of the web application
   #   Value: !Join
