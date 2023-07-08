@@ -44,7 +44,7 @@ Resources:
       ImageId: ami-0557a15b87f6559cf   #Ubuntu22 
       SecurityGroupIds:  
         - Fn::ImportValue: MonitoringSeversSecurityGroup
-      SubnetId:  !ImportValue "Public-Subnet2"
+      SubnetId:  !ImportValue "Public-Subnet1"
       KeyName: "nada"
      
   EC2Prometheus2:
@@ -71,12 +71,3 @@ Outputs:
 
 
   
-  
-  # LoadBalancerDNSName:
-  #   Description: DNS Name of the web application
-  #   Value: !Join
-  #     - ""
-  #     - - "http://"
-  #       - !GetAtt LoadBalancer.DNSName
-  #   Export:
-  #     Name: "ELB-DNS-Name"

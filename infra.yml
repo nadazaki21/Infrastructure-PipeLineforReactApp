@@ -41,16 +41,7 @@ Resources:
         - Key: Name
           Value: "Main VPC"
 
-  # MainVPC:
-  #   Type: AWS::EC2::VPC
-  #   Properties: 
-  #     CidrBlock: 10.0.0.0/16
-  #     EnableDnsSupport: true
-  #     EnableDnsHostnames: true
-  #     Tags: 
-  #       - Key: Name
-  #         Value: "Main VPC"
-        
+  
 
 
   PublicSubnet1:
@@ -64,16 +55,6 @@ Resources:
         - Key: Name
           Value:  Public Subnet1
 
-  # PublicSubnet1:
-  #   Type: AWS::EC2::Subnet
-  #   Properties: 
-  #     AvailabilityZone: us-east-1b
-  #     CidrBlock: 10.0.6.0/24
-  #     MapPublicIpOnLaunch: true
-  #     VpcId: !Ref MainVPC  
-  #     Tags: 
-  #       - Key: Name
-  #         Value:  Public Subnet1
 
 
   PublicSubnet2:
@@ -97,25 +78,11 @@ Resources:
       VpcId: !Ref MainVPC
       InternetGatewayId: !Ref InternetGW  
 
-  # InternetGW:
-  #   Type: AWS::EC2::InternetGateway
-
-  # AttachInternetGateway:
-  #   Type: AWS::EC2::VPCGatewayAttachment
-  #   Properties:
-  #     VpcId: !Ref MainVPC
-  #     InternetGatewayId: !Ref InternetGW  
-  
   
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties: 
       VpcId: !Ref MainVPC  
-
-  # PublicRouteTable:
-  #   Type: AWS::EC2::RouteTable
-  #   Properties: 
-  #     VpcId: !Ref MainVPC  
 
   PublicInternetOutboundRoute:
     Type: AWS::EC2::Route
@@ -124,14 +91,6 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGW
-        
-  # PublicInternetOutboundRoute:
-  #   Type: AWS::EC2::Route
-  #   DependsOn: AttachInternetGateway #If you create a route that references an Internet Gateway in the same template where you create the Internet Gateway, you must declare a dependency on the Internet Gateway attachment.
-  #   Properties:
-  #     RouteTableId: !Ref PublicRouteTable
-  #     DestinationCidrBlock: 0.0.0.0/0
-  #     GatewayId: !Ref InternetGW
         
 
   AssociatePUBLIC1toRT:
@@ -147,23 +106,6 @@ Resources:
       SubnetId: !Ref PublicSubnet2
 
   
-
-  
-
-  # AssociatePUBLIC1toRT:
-  #   Type: AWS::EC2::SubnetRouteTableAssociation
-  #   Properties: 
-  #     RouteTableId: !Ref PublicRouteTable
-  #     SubnetId: !Ref PublicSubnet1
-
-
-  
-  # InstanceProfile:
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties: 
-  #     InstanceProfileName: EC2Instance
-  #     Roles: 
-  #       - "react"  
 
 
   InstanceSecurityGroup:
@@ -320,14 +262,6 @@ Outputs:
       Name:  "MonitoringSeversSecurityGroup"
 
   
-  # LBSecurityGroup:
-  #   Description:  LB security rules 
-  #   Value: !Ref LBSecurityGroup
-  #   Export:
-  #     Name:  "LBSecurityGroup"
-
-
-
 
   
   # LoadBalancerDNSName:
