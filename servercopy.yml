@@ -80,6 +80,12 @@ Resources:
       HealthCheckTimeoutSeconds: 15
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 5
+      Targets:  
+        - Id: !Ref EC21   # Specify the identifier of the first EC2 instance
+          Port: 80        # Specify the port on the target instances to use for the health checks and traffic distribution
+        - Id: !Ref EC22   # Specify the identifier of the second EC2 instance
+          Port: 80
+
       Tags: 
         - Key: Identifier
           Value: React-App Serevers
