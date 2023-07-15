@@ -62,8 +62,6 @@ Resources:
         CidrIp: 0.0.0.0/0    
 
 
-  
-    
 
   TargetGroup:  
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
