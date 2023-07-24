@@ -41,7 +41,6 @@ jobs:
 
 
 
-
   create-instances:
     docker:
       - image: amazon/aws-cli 
